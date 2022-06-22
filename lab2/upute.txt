@@ -1,0 +1,10 @@
+Upute za pokretanje pm.py:
+
+inicijalizacija
+- python pm.py init "masterPassword"
+
+dodavanje adresa i sifri
+- python pm.py put "masterPassword fer.hr sifra1"
+
+dohvacanje spremljene sifra za navedenu adresu
+- pytho pm.yp get "masterPassword fer.hr"

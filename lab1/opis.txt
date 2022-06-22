@@ -1,0 +1,23 @@
+Izradeni sustav cine dvije aplikacije, tj dvije .py datoteke, usermgmt i login.
+Usermgmt predstavlja admistratorski alat za upravljanje pohranjenim lozinkama i dodavanjem novih lozinki. Login je korisnička aplikacija
+koju korisnik koristi kako bi se prijavio u sustav. U obje aplikacije tijekom unosa lozinke, lozinka nije vidljiva, odnosno konzola se ponaša kao da se tekst ne unosi.
+
+Unutar aplikacije usermgmt definirane su 4 funkcije, add, passwd, forcepass i delete.
+
+Add metoda - funckija za dodavanje novih korisnika, traži unos nove lozinke za novog korisnika. Također nudi provjeru da li navedeni korisnik već postoji i ako postoji 
+to se javlja putem konzole. Nakon unosa nove lozinke, traži se ponovi unos iste lozinke i provjera da li je lozinka dovoljno kompleksna. Nakon toga se provodi funkcija PBKDF2
+odnosno hash funckija koja uz random salt i samu lozinku stvara text koji predstavlja ispravan način pohrane lozinke za kasniju upotrebu. Sustav učitava podatke iz data.txt
+datoteke u kojoj su podatci spremljeni u redoslijedu: username, password_hash, salt, flag. Flag predstavlja da li korisnik mora promjeniti lozinku i flag postavlja admin sa
+funkcijom forcepass.
+
+passwd - funckija za promjenu lozinke koju provodi admin sustava. Nad lozinkom se provodi provjera kompleksnosti te provjera postojanja korisnika.
+
+forcepass - postavljanje zastavica da korisnik pri sljedećoj uspješnoj prijavi mora promjeniti svoju lozinku, postavlja ju admin(zastavicu).
+
+delete - briše navedenog korisnika.
+
+Unutar aplikacije login, od korisnika se traži da za navedeno korisničko ime unese ispravan password, ako je korisničko ime nepostojeće ili je unesen krivi password
+korisnika se obavještava da je ili kriva lozinka ili korisničko ime, korisniku se ne kaže što je krivo. Nakon 3 krive prijave, slijedi cooldown od 5 sekundi kako bi se spriječilo
+učestalo pogađanje, isto vrijedi ako je unesena kriva lozinka ili krivo korisničko ime. Ako je postavljena zastavica da promjenimo lozinku, nakon prijave u sustav odma nas se
+traži da promjenimo lozinku, ako se nova lozinka ne podudara sa ponovljenom novom, program se gasi i ako je nova različita od stare slijedi uspješna promjena i prijava.
+Također nad lozinkom se provodi validacija kompleksnosti.

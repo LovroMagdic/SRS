@@ -1,0 +1,19 @@
+Aplikacije su pisane u jeziku python i potreban je python 3.9 i biblioteka pycryptodome
+
+usermgmt.py
+
+add - dodavanje novog korisnika
+python usermgmt.py add username
+
+passwd - promjena lozinke navedenog korisnika
+python usermgmt.py passwd username
+
+forcepass - postavljanje zastavice za promjenu lozinke
+python usermgmt.py forcepass username
+
+delete - brisanje navedenog korisnika
+python usermgmt.py delete username
+
+login.py
+-prijava korisnika
+python login.py username

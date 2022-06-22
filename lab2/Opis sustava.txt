@@ -1,0 +1,16 @@
+Sustav projektiran u pm.py provodi se na nacin da se pri inicijalizaciji password managera enkriptira inicijalizacijska poruka koja se sastoji od nekog plain texta
+u mom slučaju to je "ovo je poruka". Kasnije pomoću te poruke provjeravam je li unesen ispravan masterPassword.
+
+-python pm.py init "masterP"
+
+funkcija encrypt radi tako da stvara salt odnosno uzima random znakove koje koristi u derivaciji za masterPassword. Za osiguranje povjerljivosti i intergriteteta
+koristim secretKey u enkripciji AES GCM modom. Kako bi osigurao da se nemoze saznati duljina poruke korisim padding od 256 bitova.
+U file spremam kombinaciju znakova - ciphertext + separator + aesCipher.nonce + separator + authTag + separator + salt - u kojem je separator odredeni skup znakova
+koji koristim kasnije pri splitanju da bi raspoznao navedene komponente jednu od druge. Za separator koristim ">~~<" bez ikakvog posebnog razloga.
+
+Decrypt se provodi tako da radim derivaciju kljuca kroz dobiveni salt i masterPassworda kojeg unosi korisnik, da bi osigurao da se file nije mijenjao od trece strane
+koristim decrypt_and_verify() [25.linija koda u funckiji decrypt] koja provjerava je li file kompromitiran ili je masterPassword krivi, u svakom slucaju osigurava intergritetet
+i povjerljivost.
+
+
+**SIDE NOTE -- encrypt i decrypt su vecinom inspirirani sa linka https://cryptobook.nakov.com/symmetric-key-ciphers/aes-encrypt-decrypt-examples
